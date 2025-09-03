@@ -24,6 +24,7 @@ app.use(cors({
       'http://localhost:5174',
       'https://for-reply.vercel.app',
       'https://for-reply-iuh5x4ouy-alessios-projects-f60f895d.vercel.app',
+      'https://client-flow-olive.vercel.app',
       process.env.FRONTEND_URL
     ].filter(Boolean);
     
