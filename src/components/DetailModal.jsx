@@ -40,7 +40,7 @@ export default function DetailModal({ title, isOpen, onClose, children }) {
           </h2>
           <button
             ref={closeButtonRef}
-            className="px-3 py-1.5 rounded-md text-sm border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800"
+            className="px-3 py-1.5 rounded-md text-sm border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-reply-500"
             onClick={onClose}
           >
             Chiudi

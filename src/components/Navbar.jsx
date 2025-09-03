@@ -14,8 +14,8 @@ export default function Navbar({ onLogout }) {
   };
 
   const linkClass = ({ isActive }) =>
-    `px-3 py-2 rounded-md text-sm font-medium ${
-      isActive ? 'bg-gray-200 dark:bg-gray-700' : 'hover:bg-gray-100 dark:hover:bg-gray-800'
+    `px-3 py-2 rounded-md text-sm font-medium nav-underline ${
+      isActive ? 'text-reply-800' : 'hover:text-reply-700'
     }`;
 
   return (
@@ -42,7 +42,7 @@ export default function Navbar({ onLogout }) {
           <div className="hidden sm:flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <span>Ciao, {user?.name}</span>
             {user?.role && (
-              <span className="px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded">
+              <span className="px-2 py-1 text-xs bg-reply-100 dark:bg-reply-900/40 text-reply-800 dark:text-reply-200 rounded">
                 {user.role}
               </span>
             )}

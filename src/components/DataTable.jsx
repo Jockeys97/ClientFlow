@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
 // columns: [{ key, header, render?, sortable?, className? }]
 // data: array
@@ -19,6 +19,7 @@ export default function DataTable({
   onFilterQueryChange,
   filterFunction,
 }) {
+  const [dense, setDense] = useState(false);
   const { page, pageSize, total, onPageChange } = pagination || {};
 
   const filteredData = useMemo(() => {
@@ -33,8 +34,11 @@ export default function DataTable({
     return Math.max(1, Math.ceil(total / pageSize));
   }, [pagination, total, pageSize]);
 
+  const thPadding = dense ? 'py-2' : 'py-3';
+  const tdPadding = dense ? 'py-2' : 'py-3';
+
   return (
-    <div className="overflow-hidden border border-gray-200 dark:border-gray-700 rounded-lg">
+    <div className="overflow-hidden border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm">
       {showFilterInput ? (
         <div className="px-4 py-2 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
           <input
@@ -43,22 +47,32 @@ export default function DataTable({
             value={filterQuery}
             onChange={(e) => onFilterQueryChange && onFilterQueryChange(e.target.value)}
             placeholder="Filtra…"
-            className="w-full sm:w-72 px-3 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm"
+            className="w-full sm:w-72 px-3 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm focus:outline-none focus:ring-reply-500 focus:border-reply-500"
           />
         </div>
-      ) : null}
+      ) : (
+        <div className="px-4 py-2 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center justify-end">
+          <button
+            aria-label="Toggle density"
+            className="px-2 py-1 rounded-md text-xs border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700"
+            onClick={() => setDense((d) => !d)}
+          >
+            {dense ? 'Compatta: ON' : 'Compatta: OFF'}
+          </button>
+        </div>
+      )}
       <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-        <thead className="bg-gray-50 dark:bg-gray-800">
+        <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0">
           <tr>
             {columns.map((col) => (
               <th
                 key={col.key}
                 scope="col"
-                className={`px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 ${col.className || ''}`}
+                className={`px-4 ${thPadding} text-left text-xs font-semibold tracking-wide text-gray-600 dark:text-gray-300 ${col.className || ''}`}
               >
                 {col.sortable ? (
                   <button
-                    className="inline-flex items-center gap-1 hover:underline"
+                    className="inline-flex items-center gap-1 hover:underline text-reply-700 dark:text-reply-300"
                     onClick={() => {
                       const nextDir = sort?.key === col.key && sort?.direction === 'asc' ? 'desc' : 'asc';
                       onSort && onSort(col.key, nextDir);
@@ -87,11 +101,11 @@ export default function DataTable({
             filteredData.map((row, idx) => (
               <tr
                 key={idx}
-                className="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
+                className="hover:bg-gray-50 dark:hover:bg-gray-800 odd:bg-gray-50/40 dark:odd:bg-gray-800/40 cursor-pointer transition-colors"
                 onClick={() => onRowClick && onRowClick(row)}
               >
                 {columns.map((col) => (
-                  <td key={col.key} className={`px-4 py-2 text-sm ${col.className || ''}`}>
+                  <td key={col.key} className={`px-4 ${tdPadding} text-sm ${col.className || ''}`}>
                     {col.render ? col.render(row[col.key], row) : row[col.key]}
                   </td>
                 ))}

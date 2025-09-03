@@ -72,10 +72,18 @@ export async function getTicketsByProject(projectId, { signal } = {}) {
 
 // CRUD Operations for Clients
 export async function createClient(clientData) {
-  return await safeFetch(`${API_BASE}/clients`, {
+  const created = await safeFetch(`${API_BASE}/clients`, {
     method: 'POST',
     body: JSON.stringify(clientData)
   });
+  try {
+    const { cache, setCache } = useDataStore.getState();
+    const existing = (cache && Array.isArray(cache.clients)) ? cache.clients : (cache?.clients?.data || []);
+    setCache((prev) => ({ ...prev, clients: [created, ...existing] }));
+  } catch (e) {
+    // ignore cache update errors
+  }
+  return created;
 }
 
 export async function updateClient(id, clientData) {
@@ -158,9 +166,9 @@ export async function ensureAllDataLoaded(controller = new AbortController()) {
   
   try {
     const [clientsResponse, projectsResponse, ticketsResponse] = await Promise.all([
-      cache.clients ? Promise.resolve(cache.clients) : getClients({ signal: controller.signal }),
-      cache.projects ? Promise.resolve(cache.projects) : getProjects({ signal: controller.signal }),
-      cache.tickets ? Promise.resolve(cache.tickets) : getTickets({ signal: controller.signal }),
+      cache.clients ? Promise.resolve(cache.clients) : getClients({ signal: controller.signal, page: 1, limit: 1000 }),
+      cache.projects ? Promise.resolve(cache.projects) : getProjects({ signal: controller.signal, page: 1, limit: 1000 }),
+      cache.tickets ? Promise.resolve(cache.tickets) : getTickets({ signal: controller.signal, page: 1, limit: 1000 }),
     ]);
     
     const clients = clientsResponse.data || clientsResponse;

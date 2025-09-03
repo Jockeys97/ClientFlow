@@ -5,9 +5,10 @@ import Select from '../components/Select.jsx';
 import Skeleton from '../components/Skeleton.jsx';
 import DetailModal from '../components/DetailModal.jsx';
 import Badge from '../components/Badge.jsx';
-import { ensureAllDataLoaded } from '../services/api.js';
+import { ensureAllDataLoaded, deleteTicket } from '../services/api.js';
 import { includesAll } from '../utils/filters.js';
 import { useDataStore } from '../store/useDataStore.js';
+import { downloadCsv } from '../utils/csv.js';
 
 export default function Tickets() {
   const [loading, setLoading] = useState(true);
@@ -60,6 +61,19 @@ export default function Tickets() {
   const [form, setForm] = useState({ subject: '', requester: '', projectId: '' });
   const [formError, setFormError] = useState('');
 
+  function exportCsv() {
+    const rows = filtered.map((t) => ({
+      id: t.id,
+      title: t.title || t.subject || '',
+      requester: t.requester || '',
+      project: t.project?.title || '',
+      status: t.status || '',
+      priority: t.priority || '',
+      createdAt: t.createdAt || '',
+    }));
+    downloadCsv('tickets.csv', rows);
+  }
+
   function handleCreateTicket(e) {
     e.preventDefault();
     setFormError('');
@@ -101,6 +115,7 @@ export default function Tickets() {
           <option value="RESOLVED">Risolti</option>
           <option value="CLOSED">Chiusi</option>
         </Select>
+        <button className="px-3 py-2 rounded-md border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800" onClick={exportCsv}>Esporta CSV</button>
         <button className="ml-auto px-3 py-2 rounded-md border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800" onClick={() => setIsNewOpen(true)}>
           Nuovo ticket
         </button>
@@ -111,6 +126,23 @@ export default function Tickets() {
           { key: 'priority', header: 'Priorità', sortable: true, render: (v) => <Badge color={v === 'URGENT' ? 'red' : v === 'HIGH' ? 'orange' : 'gray'}>{v}</Badge> },
           { key: 'project', header: 'Progetto', render: (v) => v?.title || '—' },
           { key: 'status', header: 'Stato', render: (v) => <Badge color={v === 'OPEN' ? 'green' : v === 'IN_PROGRESS' ? 'blue' : 'gray'}>{v}</Badge> },
+          { key: 'actions', header: '', className: 'text-right', render: (_, row) => (
+            <button
+              className="px-2 py-1 rounded border border-red-300 text-red-600 hover:bg-red-50"
+              onClick={async (e) => {
+                e.stopPropagation();
+                if (!confirm(`Eliminare il ticket "${row.title || row.subject}"?`)) return;
+                try {
+                  await deleteTicket(row.id);
+                  setTickets((prev) => prev.filter((t) => t.id !== row.id));
+                } catch (err) {
+                  alert(`Errore: ${err.message}`);
+                }
+              }}
+            >
+              Elimina
+            </button>
+          ) },
         ]}
         data={pageData}
         sort={sort}

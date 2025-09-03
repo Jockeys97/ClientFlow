@@ -22,9 +22,11 @@ html, body, #root {
   @apply p-4;
 }
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -34,4 +36,73 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+/* Reply-like tokens and utilities */
+:root {
+  --reply-primary: #00A651;
+  --reply-primary-contrast: #ffffff;
+  --reply-muted: #6B7280; /* gray-500 */
+}
+
+.btn-primary {
+  @apply inline-flex items-center justify-center px-4 py-2 rounded-md font-medium shadow-sm;
+  background-color: var(--reply-primary);
+  color: var(--reply-primary-contrast);
+}
+
+.btn-primary:hover {
+  @apply opacity-95;
+}
+
+.link-primary {
+  color: var(--reply-primary);
+}
+
+.link-primary:hover {
+  @apply underline;
+}
+
+/* Navbar underline effect (Reply-like) */
+.nav-underline {
+  position: relative;
+}
+
+.nav-underline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background-color: var(--reply-primary);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 180ms ease;
+  border-radius: 9999px;
+}
+
+.nav-underline:hover::after,
+.nav-underline[aria-current='page']::after {
+  transform: scaleX(1);
+}
+
+/* Subtle fade/slide-up for sections */
+.fade-in {
+  animation: fadeIn 300ms ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Pulse highlight utility for badges/buttons */
+.pulse-soft {
+  animation: pulseSoft 1.8s ease-in-out infinite;
+}
+
+@keyframes pulseSoft {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0,166,81,0.35); }
+  50% { box-shadow: 0 0 0 8px rgba(0,166,81,0.0); }
 }

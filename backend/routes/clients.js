@@ -3,6 +3,7 @@ import { body, validationResult } from 'express-validator';
 import { PrismaClient } from '@prisma/client';
 import { authMiddleware } from '../lib/auth.js';
 import { getPaginationParams, createPaginationResponse, buildWhereClause } from '../lib/pagination.js';
+import emailService from '../lib/email.js';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -106,6 +107,11 @@ router.post('/', [
         userId: req.user.id
       }
     });
+
+    // Send welcome email (non-blocking)
+    emailService.sendWelcomeEmail(client).catch(err => 
+      console.error('Welcome email failed for client', client.id, ':', err.message)
+    );
 
     res.status(201).json(client);
   } catch (error) {

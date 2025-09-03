@@ -7,8 +7,10 @@ import Skeleton from '../components/Skeleton.jsx';
 import DetailModal from '../components/DetailModal.jsx';
 import Badge from '../components/Badge.jsx';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, Legend } from 'recharts';
+import { useNavigate } from 'react-router-dom';
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [clients, setClients] = useState([]);
@@ -126,21 +128,31 @@ export default function Dashboard() {
             <BarChart data={ticketsPerMonth} margin={{ top: 16, right: 16, left: 0, bottom: 0 }}>
               <XAxis dataKey="month" />
               <YAxis allowDecimals={false} />
-              <Tooltip />
-              <Bar dataKey="value" fill="#60a5fa" />
+              <Tooltip wrapperStyle={{ borderRadius: 8, boxShadow: '0 8px 24px rgba(0,0,0,0.12)' }} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
+              <Bar dataKey="value" fill="#60a5fa" isAnimationActive animationDuration={600} animationBegin={0} />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>
         <ChartCard title="Progetti per cliente">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
-              <Pie data={projectsByClient} dataKey="value" nameKey="name" outerRadius={100} label={false} labelLine={false}>
+              <Pie data={projectsByClient} dataKey="value" nameKey="name" outerRadius={110} innerRadius={60} label={false} labelLine={false}
+                   onClick={(data) => {
+                     if (!data?.name || data.name === 'Altri') return;
+                     navigate(`/projects?clientName=${encodeURIComponent(data.name)}`);
+                   }}
+              >
                 {projectsByClient.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
+                  <Cell key={`cell-${index}`} fill={entry.color} stroke="#ffffff" strokeWidth={1} cursor={entry.name !== 'Altri' ? 'pointer' : 'default'} />
                 ))}
               </Pie>
-              <Legend layout="vertical" align="right" verticalAlign="middle" />
-              <Tooltip />
+              <Legend layout="vertical" align="right" verticalAlign="middle" iconType="circle" formatter={(value, entry, index) => {
+                const total = projectsByClient.reduce((acc, i) => acc + i.value, 0);
+                const current = projectsByClient[index]?.value || 0;
+                const pct = total ? Math.round((current / total) * 100) : 0;
+                return `${value} (${pct}%)`;
+              }} />
+              <Tooltip wrapperStyle={{ borderRadius: 8, boxShadow: '0 8px 24px rgba(0,0,0,0.12)' }} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
             </PieChart>
           </ResponsiveContainer>
         </ChartCard>

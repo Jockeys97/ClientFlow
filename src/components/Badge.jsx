@@ -1,7 +1,7 @@
 import React from 'react';
 
 const colorMap = {
-  green: 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-200',
+  green: 'bg-reply-100 text-reply-800 dark:bg-reply-900/40 dark:text-reply-200',
   red: 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-200',
   gray: 'bg-gray-100 text-gray-800 dark:bg-gray-900/40 dark:text-gray-200',
   blue: 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200',
